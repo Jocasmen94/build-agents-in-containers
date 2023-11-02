@@ -1,11 +1,17 @@
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: devopsagent
+---
+apiVersion: v1
 kind: Secret
 metadata:
-  name: pipeline-auth
+  name: azdevops
+  namespace: devopsagent
 data:
-  AZP_URL: aHR0cHM6Ly9kZXYuYXp1cmUuY29tL2hvdXNzZW1kZWxsYWk= # https://dev.azure.com/houssemdellai
-  AZP_POOL: bGludXgtY29udGFpbmVycy1ha3M= # linux-containers-aks
-  AZP_TOKEN: <YOUR_PAT_TOKEN>
+  AZP_URL: aHR0cHM6Ly9kZXYuYXp1cmUuY29tL2phaXZlcmpvY2FzbWVuOTQ= # Base64 encoded URL
+  AZP_POOL: bGludXgtY29udGFpbmVycy1ha3M= # Base64 encoded Pool
+  AZP_TOKEN: enk1NjJ1NjVzNHc0bW16M25iaoRieGg0c3U3NGJjd3F2NmI2YWhhcWpvd2w1amE= # Base64 encoded Token
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -15,7 +21,7 @@ metadata:
   labels:
     app: azdevops-agent
 spec:
-  replicas: 2 #here is the configuration for the actual agent always running
+  replicas: 2
   selector:
     matchLabels:
       app: azdevops-agent
@@ -26,7 +32,7 @@ spec:
     spec:
       containers:
       - name: azdevops-agent
-        image: acrforakscluster.azurecr.io/dockeragent:ubuntu-18.04
+        image: jocasmenacr.azurecr.io/dockeragent:ubuntu-20.04
         env:
           - name: AZP_URL
             valueFrom:
